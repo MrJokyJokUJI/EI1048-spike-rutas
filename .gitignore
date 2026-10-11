@@ -1,4 +1,17 @@
-target/
+# Claves de API (no se suben)
+secrets.properties
+local.properties
+
+# Web (Maven)
+web/target/
+
+# Android (Gradle)
+android/.gradle/
+android/build/
+android/app/build/
+android/.kotlin/
+*.apk
+
+# IDE
 .idea/
 *.iml
-secrets.properties
