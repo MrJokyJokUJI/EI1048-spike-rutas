@@ -4,6 +4,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 // La key de openrouteservice se lee de local.properties (no se sube a GitHub)
@@ -23,6 +24,8 @@ android {
         versionCode = 1
         versionName = "0.1"
         buildConfigField("String", "ORS_API_KEY", "\"${localProps.getProperty("ors.api-key", "")}\"")
+        buildConfigField("String", "SUPABASE_URL", "\"${localProps.getProperty("supabase.url", "")}\"")
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"${localProps.getProperty("supabase.anon-key", "")}\"")
     }
 
     buildFeatures {
@@ -48,8 +51,15 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("org.osmdroid:osmdroid-android:6.1.20")
 
+    implementation(platform("io.github.jan-tennert.supabase:bom:3.0.1"))
+    implementation("io.github.jan-tennert.supabase:postgrest-kt")
+    implementation("io.github.jan-tennert.supabase:auth-kt")
+    implementation("io.ktor:ktor-client-okhttp:3.0.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+
     testImplementation("junit:junit:4.13.2")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+    testImplementation("io.ktor:ktor-client-mock:3.0.0")
     // org.json de Android no funciona en los tests de JVM, se usa la librería real
     testImplementation("org.json:json:20240303")
 }

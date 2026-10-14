@@ -20,7 +20,11 @@ class OrsClient(
 
     private fun get(url: HttpUrl): JSONObject {
         val respuesta = http.newCall(Request.Builder().url(url).build()).execute()
-        respuesta.use { return JSONObject(it.body!!.string()) }
+        respuesta.use {
+            val cuerpo = it.body?.string().orEmpty()
+            if (!it.isSuccessful) throw RuntimeException("HTTP ${it.code}: $cuerpo")
+            return JSONObject(cuerpo)
+        }
     }
 
     // Devuelve (longitud, latitud) del primer resultado

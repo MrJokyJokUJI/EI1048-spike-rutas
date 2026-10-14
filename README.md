@@ -28,3 +28,27 @@ gradlew testDebugUnitTest
 ```
 
 `OrsClientTest` cubre un escenario válido (ruta en coche entre Castellón y Valencia) y uno inválido (destino inexistente).
+
+## Supabase (auth + persistencia)
+
+El spike integra Supabase (PostgreSQL) para cubrir registro/login (HU01/HU02) y guardar/listar rutas (HU32/HU33, R6).
+
+### Configuración
+
+1. Crea el proyecto en https://supabase.com y copia la **URL** y la **anon key** (*Project Settings → API*).
+2. Añádelas a `android/local.properties`:
+   ```
+   supabase.url=https://TUPROYECTO.supabase.co
+   supabase.anon-key=TU_ANON_KEY
+   ```
+3. Ejecuta `supabase/schema.sql` en el **SQL Editor** de Supabase. Crea la tabla `ruta_guardada` y su política de Row Level Security (cada usuario solo ve/guarda sus filas).
+4. Desactiva la confirmación de email para el spike: *Authentication → Sign In / Providers → Email → desmarca "Confirm email"*. Así `registrar` devuelve sesión directamente.
+
+### Pruebas
+
+Los tests de persistencia usan un `MockEngine` de Ktor (sin red): `RutaGuardadaTest` (mapeo de columnas) y `RutasRepositoryTest` (POST/GET contra la API simulada).
+
+```
+cd android
+gradlew testDebugUnitTest
+```
