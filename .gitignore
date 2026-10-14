@@ -1,9 +1,5 @@
 # Claves de API (no se suben)
-secrets.properties
 local.properties
-
-# Web (Maven)
-web/target/
 
 # Android (Gradle)
 android/.gradle/
@@ -15,3 +11,5 @@ android/.kotlin/
 # IDE
 .idea/
 *.iml
+
+videos/
