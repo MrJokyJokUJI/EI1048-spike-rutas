@@ -1,0 +1,15 @@
+# Claves de API (no se suben)
+local.properties
+
+# Android (Gradle)
+android/.gradle/
+android/build/
+android/app/build/
+android/.kotlin/
+*.apk
+
+# IDE
+.idea/
+*.iml
+
+videos/
