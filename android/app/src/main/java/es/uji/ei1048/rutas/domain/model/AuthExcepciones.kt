@@ -6,3 +6,5 @@ package es.uji.ei1048.rutas.domain.model
 open class AuthException(mensaje: String) : Exception(mensaje)
 
 class CredencialesInvalidasException : AuthException("Credenciales inválidas")
+
+class SinSesionActivaException : AuthException("No hay ninguna sesión activa")
