@@ -1,6 +1,7 @@
 package es.uji.ei1048.rutas.domain.usecase
 
 import es.uji.ei1048.rutas.domain.model.CoordenadasFueraDeRangoException
+import es.uji.ei1048.rutas.domain.model.FalloConexionServidorException
 import es.uji.ei1048.rutas.domain.model.LugarInteres
 import es.uji.ei1048.rutas.domain.model.LugarYaExisteException
 import es.uji.ei1048.rutas.domain.model.NombreLugarInvalidoException
@@ -9,13 +10,13 @@ import es.uji.ei1048.rutas.domain.model.UsuarioNoAutenticadoException
 import es.uji.ei1048.rutas.domain.repository.LugaresRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
 /**
  * Tests unitarios para AltaLugarPorCoordenadasUseCase con fakes manuales (ARQUITECTURA.md).
+ * Cubre los escenarios E1, E2, E3 de Entrega 1 y comprobaciones unitarias del caso de uso.
  */
 class AltaLugarPorCoordenadasUseCaseTest {
 
@@ -51,7 +52,7 @@ class AltaLugarPorCoordenadasUseCaseTest {
     }
 
     @Test
-    fun altaCorrecta_creaLugarConCoordenadas() = runBlocking {
+    fun e1_altaCorrecta_creaLugarConCoordenadas() = runBlocking {
         val res = useCase(usuarioId, "Castellón", 39.9864, -0.0513)
 
         assertTrue(res.isSuccess)
@@ -63,10 +64,18 @@ class AltaLugarPorCoordenadasUseCaseTest {
     }
 
     @Test
-    fun coordenadasInvalidas_devuelveFallo() = runBlocking {
+    fun e2_coordenadasInvalidas_devuelveFallo() = runBlocking {
         val res = useCase(usuarioId, "Castellón", 100.0, -0.0513)
         assertTrue(res.isFailure)
         assertTrue(res.exceptionOrNull() is CoordenadasFueraDeRangoException)
+    }
+
+    @Test
+    fun e3_servidorNoDisponible_devuelveFallo() = runBlocking {
+        repository.falloSimulado = FalloConexionServidorException()
+        val res = useCase(usuarioId, "Castellón", 39.9864, -0.0513)
+        assertTrue(res.isFailure)
+        assertTrue(res.exceptionOrNull() is FalloConexionServidorException)
     }
 
     @Test

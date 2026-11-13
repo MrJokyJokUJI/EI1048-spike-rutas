@@ -4,10 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import es.uji.ei1048.rutas.domain.model.CoordenadasFueraDeRangoException
 import es.uji.ei1048.rutas.domain.model.FalloConexionServidorException
 import es.uji.ei1048.rutas.domain.model.LugarInteres
-import es.uji.ei1048.rutas.domain.model.LugarYaExisteException
-import es.uji.ei1048.rutas.domain.model.NombreLugarInvalidoException
 import es.uji.ei1048.rutas.domain.model.Punto
-import es.uji.ei1048.rutas.domain.model.UsuarioNoAutenticadoException
 import es.uji.ei1048.rutas.domain.repository.LugaresRepository
 import es.uji.ei1048.rutas.domain.usecase.AltaLugarPorCoordenadasUseCase
 import kotlinx.coroutines.runBlocking
@@ -21,11 +18,10 @@ import org.junit.runner.RunWith
 /**
  * Pruebas de aceptación de la HU06: Alta de lugar de interés usando coordenadas (ATDD).
  *
- * Basadas en el análisis de escenarios de Entrega 1 arreglada:
+ * Basadas estrictamente en el análisis de escenarios de Entrega 1:
  * - HU06-E1 (Válido): servidor conectado, sesión iniciada, coordenadas y nombre válidos -> lugar creado y persistido.
  * - HU06-E2 (Inválido): servidor conectado, sesión iniciada, coordenadas fuera de rango -> error CoordenadasFueraDeRangoException.
  * - HU06-E3 (Inválido): servidor no disponible -> error FalloConexionServidorException.
- * - Adicionales de robustez: nombre inválido/vacío, usuario no autenticado, lugar duplicado.
  */
 @RunWith(AndroidJUnit4::class)
 class Hu06AltaLugarCoordenadasTest {
@@ -70,7 +66,7 @@ class Hu06AltaLugarCoordenadasTest {
     }
 
     /**
-     * HU06-E1:
+     * HU06-E1 (Válido):
      * GIVEN el servidor está conectado, tengo la sesión iniciada y el lugar Mirador de Madrid no existe previamente en mi lista,
      * WHEN introduzco las coordenadas latitud 40.4168 y longitud -3.7038 y el nombre Mirador de Madrid y guardo,
      * THEN el sistema devuelve los datos del nuevo lugar creado y se persiste el registro del lugar de interés asociado al usuario.
@@ -108,7 +104,7 @@ class Hu06AltaLugarCoordenadasTest {
     }
 
     /**
-     * HU06-E2:
+     * HU06-E2 (Inválido):
      * GIVEN el servidor está conectado, tengo la sesión iniciada y la lista de lugares no contiene previamente la ubicación a registrar,
      * WHEN introduzco las coordenadas fuera de rango latitud 999.0 y longitud -3.7038 y guardo,
      * THEN el sistema devuelve un error de coordenadas fuera de rango y no se añade ningún lugar a la base de datos.
@@ -139,7 +135,7 @@ class Hu06AltaLugarCoordenadasTest {
     }
 
     /**
-     * HU06-E3:
+     * HU06-E3 (Inválido):
      * GIVEN el servidor no está disponible y tengo la sesión iniciada,
      * WHEN intento dar de alta un lugar con datos válidos,
      * THEN el sistema devuelve un error de fallo de conexión con el servidor y la persistencia no varía.
@@ -164,68 +160,5 @@ class Hu06AltaLugarCoordenadasTest {
             resultado.exceptionOrNull() is FalloConexionServidorException,
         )
         assertTrue(repository.lugares.isEmpty())
-    }
-
-    /**
-     * Escenario adicional de robustez: nombre vacío o en blanco.
-     */
-    @Test
-    fun hu06_extra_nombreVacio_fallaConNombreInvalidoException() = runBlocking {
-        val resultado = altaLugarPorCoordenadas(
-            usuarioId = usuarioAutenticadoId,
-            nombre = "   ",
-            latitud = 40.4168,
-            longitud = -3.7038,
-        )
-
-        assertTrue(resultado.isFailure)
-        assertTrue(resultado.exceptionOrNull() is NombreLugarInvalidoException)
-        assertTrue(repository.lugares.isEmpty())
-    }
-
-    /**
-     * Escenario adicional: usuario sin sesión iniciada.
-     */
-    @Test
-    fun hu06_extra_sinSesion_fallaConUsuarioNoAutenticadoException() = runBlocking {
-        val resultado = altaLugarPorCoordenadas(
-            usuarioId = "",
-            nombre = "Plaza Mayor",
-            latitud = 39.9864,
-            longitud = -0.0513,
-        )
-
-        assertTrue(resultado.isFailure)
-        assertTrue(resultado.exceptionOrNull() is UsuarioNoAutenticadoException)
-        assertTrue(repository.lugares.isEmpty())
-    }
-
-    /**
-     * Escenario adicional: lugar ya existente con ese nombre para el mismo usuario.
-     */
-    @Test
-    fun hu06_extra_lugarYaExistente_fallaConLugarYaExisteException() = runBlocking {
-        // GIVEN: ya existe "Casa"
-        repository.lugares.add(
-            LugarInteres(
-                id = "1",
-                usuarioId = usuarioAutenticadoId,
-                nombre = "Casa",
-                coordenadas = Punto(39.9864, -0.0513),
-            )
-        )
-
-        // WHEN: se intenta dar de alta otro con el mismo nombre
-        val resultado = altaLugarPorCoordenadas(
-            usuarioId = usuarioAutenticadoId,
-            nombre = "Casa",
-            latitud = 40.0,
-            longitud = -0.1,
-        )
-
-        // THEN
-        assertTrue(resultado.isFailure)
-        assertTrue(resultado.exceptionOrNull() is LugarYaExisteException)
-        assertEquals(1, repository.lugares.size)
     }
 }
