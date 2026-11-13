@@ -4,7 +4,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import es.uji.ei1048.rutas.domain.model.FalloConexionServidorException
 import es.uji.ei1048.rutas.domain.model.LugarInteres
 import es.uji.ei1048.rutas.domain.model.Punto
-import es.uji.ei1048.rutas.domain.model.UsuarioNoAutenticadoException
 import es.uji.ei1048.rutas.domain.repository.LugaresRepository
 import es.uji.ei1048.rutas.domain.usecase.ConsultarLugaresUseCase
 import kotlinx.coroutines.runBlocking
@@ -17,14 +16,11 @@ import org.junit.runner.RunWith
 /**
  * Pruebas de aceptación de la HU08: Consulta de lista de lugares de interés dados de alta (ATDD).
  *
- * Basadas en el análisis de escenarios de Entrega 1 arreglada:
+ * Basadas estrictamente en el análisis de escenarios de Entrega 1:
  * - HU08-E1 (Válido): servidor conectado, sesión iniciada y lugares dados de alta (Casa y Trabajo) ->
  *                     el sistema devuelve la lista completa de lugares y la base de datos se mantiene inalterada.
  * - HU08-E2 (Inválido): servidor no disponible, sesión iniciada ->
  *                       el sistema devuelve un error de fallo de conexión con el servidor y la persistencia no cambia.
- * - Escenarios adicionales de robustez:
- *   - Usuario sin lugares registrados (lista vacía).
- *   - Usuario no autenticado (sin sesión activa).
  */
 @RunWith(AndroidJUnit4::class)
 class Hu08ListarLugaresTest {
@@ -141,27 +137,5 @@ class Hu08ListarLugaresTest {
         )
         // El estado de la persistencia no cambia
         assertEquals(1, repository.lugares.size)
-    }
-
-    /**
-     * Escenario adicional: usuario sin lugares registrados devuelve lista vacía sin error.
-     */
-    @Test
-    fun hu08_extra_usuarioSinLugares_devuelveListaVacia() = runBlocking {
-        val resultado = consultarLugares(usuarioId = usuarioAutenticadoId)
-
-        assertTrue(resultado.isSuccess)
-        assertTrue(resultado.getOrThrow().isEmpty())
-    }
-
-    /**
-     * Escenario adicional: usuario no autenticado (sin sesión) devuelve UsuarioNoAutenticadoException.
-     */
-    @Test
-    fun hu08_extra_sinSesion_fallaConUsuarioNoAutenticadoException() = runBlocking {
-        val resultado = consultarLugares(usuarioId = "")
-
-        assertTrue(resultado.isFailure)
-        assertTrue(resultado.exceptionOrNull() is UsuarioNoAutenticadoException)
     }
 }
