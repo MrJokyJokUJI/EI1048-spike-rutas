@@ -6,7 +6,7 @@ import es.uji.ei1048.rutas.domain.model.CredencialesInvalidasException
 import es.uji.ei1048.rutas.domain.model.EmailYaRegistradoException
 import es.uji.ei1048.rutas.domain.model.FormatoEmailInvalidoException
 import es.uji.ei1048.rutas.domain.repository.AuthRepository
-import es.uji.ei1048.rutas.domain.usecase.RegistrarCasoUso
+import es.uji.ei1048.rutas.domain.usecase.RegistrarUseCase
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -23,7 +23,7 @@ import org.junit.runner.RunWith
 class Hu01RegistroTest {
 
     private lateinit var authRepository: AuthRepository
-    private lateinit var registrarCasoUso: RegistrarCasoUso
+    private lateinit var registrarUseCase: RegistrarUseCase
 
     private val password = "pepitoPassword"
 
@@ -33,7 +33,7 @@ class Hu01RegistroTest {
     @Before
     fun setUp() {
         authRepository = AuthRepositoryImpl()
-        registrarCasoUso = RegistrarCasoUso(authRepository)
+        registrarUseCase = RegistrarUseCase(authRepository)
     }
 
     /**
@@ -51,7 +51,7 @@ class Hu01RegistroTest {
         assertNull(authRepository.sesionActual())
 
         // WHEN
-        val sesion = registrarCasoUso.registrarUsuario(email, password)
+        val sesion = registrarUseCase(email, password)
 
         // THEN
         assertEquals(email, sesion.email)
@@ -76,7 +76,7 @@ class Hu01RegistroTest {
 
         // WHEN
         try {
-            registrarCasoUso.registrarUsuario(email, password)
+            registrarUseCase(email, password)
             fail("Se esperaba EmailYaRegistradoException")
         } catch (e: EmailYaRegistradoException) {
             // THEN
@@ -102,7 +102,7 @@ class Hu01RegistroTest {
 
         // WHEN
         try {
-            registrarCasoUso.registrarUsuario(emailInvalido, password)
+            registrarUseCase(emailInvalido, password)
             fail("Se esperaba FormatoEmailInvalidoException")
         } catch (e: FormatoEmailInvalidoException) {
             // THEN: error de formato de email...
