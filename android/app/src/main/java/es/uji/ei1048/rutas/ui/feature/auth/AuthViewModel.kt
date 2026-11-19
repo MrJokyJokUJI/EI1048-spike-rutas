@@ -2,6 +2,7 @@ package es.uji.ei1048.rutas.ui.feature.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import es.uji.ei1048.rutas.domain.usecase.IniciarSesionUseCase
 import es.uji.ei1048.rutas.domain.usecase.RegistrarUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,6 +17,7 @@ import kotlinx.coroutines.launch
  */
 class AuthViewModel(
     private val registrarUseCase: RegistrarUseCase,
+    private val iniciarSesionUseCase: IniciarSesionUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AuthUiState())
@@ -30,6 +32,40 @@ class AuthViewModel(
             is AuthEvent.ErrorDescartado -> _state.update { it.copy(error = null) }
             is AuthEvent.MensajeExitoDescartado -> _state.update { it.copy(mensajeExito = null) }
             is AuthEvent.Registrar -> registrar()
+            is AuthEvent.IniciarSesion -> iniciarSesion()
+        }
+    }
+
+    private fun iniciarSesion() {
+        val actual = _state.value
+        if (actual.email.isBlank() || actual.password.isBlank()) {
+            _state.update { it.copy(error = "Introduce el email y la contraseña.") }
+            return
+        }
+
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true, error = null) }
+            runCatching { iniciarSesionUseCase(actual.email, actual.password) }
+                .onSuccess { sesion ->
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            sesion = sesion,
+                            password = "",
+                            confirmacion = "",
+                            mensajeExito = "Sesión iniciada correctamente.",
+                        )
+                    }
+                }
+                .onFailure { fallo ->
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            sesion = null,
+                            error = fallo.message ?: "Error desconocido al iniciar sesión.",
+                        )
+                    }
+                }
         }
     }
 

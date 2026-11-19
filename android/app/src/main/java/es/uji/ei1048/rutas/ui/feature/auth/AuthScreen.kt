@@ -17,6 +17,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -67,7 +68,7 @@ fun AuthScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text("Registro", fontWeight = FontWeight.Bold) },
+                title = { Text("Acceso", fontWeight = FontWeight.Bold) },
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -126,6 +127,14 @@ fun AuthScreen(
                     Spacer(modifier = Modifier.width(8.dp))
                 }
                 Text("Registrar")
+            }
+
+            OutlinedButton(
+                onClick = { onEvent(AuthEvent.IniciarSesion) },
+                enabled = !state.isLoading && state.email.isNotBlank() && state.password.isNotBlank(),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Iniciar sesión")
             }
 
             state.sesion?.let { sesion ->

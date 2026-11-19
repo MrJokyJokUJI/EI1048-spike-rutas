@@ -10,6 +10,7 @@ sealed interface AuthEvent {
     data class PasswordCambiado(val password: String) : AuthEvent
     data class ConfirmacionCambiada(val confirmacion: String) : AuthEvent
     data object Registrar : AuthEvent
+    data object IniciarSesion : AuthEvent
     data object ErrorDescartado : AuthEvent
     data object MensajeExitoDescartado : AuthEvent
 }

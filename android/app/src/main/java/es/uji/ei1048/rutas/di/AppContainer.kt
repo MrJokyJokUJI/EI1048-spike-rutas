@@ -4,6 +4,7 @@ import es.uji.ei1048.rutas.BuildConfig
 import es.uji.ei1048.rutas.data.remote.supabase.AuthRemoteDataSource
 import es.uji.ei1048.rutas.data.repository.AuthRepositoryImpl
 import es.uji.ei1048.rutas.domain.repository.AuthRepository
+import es.uji.ei1048.rutas.domain.usecase.IniciarSesionUseCase
 import es.uji.ei1048.rutas.domain.usecase.RegistrarUseCase
 import es.uji.ei1048.rutas.ui.feature.auth.AuthViewModelFactory
 import okhttp3.OkHttpClient
@@ -37,7 +38,14 @@ class AppContainer(
         RegistrarUseCase(authRepository = authRepository)
     }
 
+    val iniciarSesionUseCase: IniciarSesionUseCase by lazy {
+        IniciarSesionUseCase(authRepository = authRepository)
+    }
+
     val authViewModelFactory: AuthViewModelFactory by lazy {
-        AuthViewModelFactory(registrarUseCase = registrarUseCase)
+        AuthViewModelFactory(
+            registrarUseCase = registrarUseCase,
+            iniciarSesionUseCase = iniciarSesionUseCase,
+        )
     }
 }
