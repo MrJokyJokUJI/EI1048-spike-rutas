@@ -4,6 +4,7 @@ import es.uji.ei1048.rutas.BuildConfig
 import es.uji.ei1048.rutas.data.remote.supabase.AuthRemoteDataSource
 import es.uji.ei1048.rutas.data.repository.AuthRepositoryImpl
 import es.uji.ei1048.rutas.domain.repository.AuthRepository
+import es.uji.ei1048.rutas.domain.usecase.CerrarSesionUseCase
 import es.uji.ei1048.rutas.domain.usecase.IniciarSesionUseCase
 import es.uji.ei1048.rutas.domain.usecase.RegistrarUseCase
 import es.uji.ei1048.rutas.ui.feature.auth.AuthViewModelFactory
@@ -42,10 +43,15 @@ class AppContainer(
         IniciarSesionUseCase(authRepository = authRepository)
     }
 
+    val cerrarSesionUseCase: CerrarSesionUseCase by lazy {
+        CerrarSesionUseCase(authRepository = authRepository)
+    }
+
     val authViewModelFactory: AuthViewModelFactory by lazy {
         AuthViewModelFactory(
             registrarUseCase = registrarUseCase,
             iniciarSesionUseCase = iniciarSesionUseCase,
+            cerrarSesionUseCase = cerrarSesionUseCase,
         )
     }
 }

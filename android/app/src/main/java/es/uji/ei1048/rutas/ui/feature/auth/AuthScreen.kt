@@ -148,6 +148,13 @@ fun AuthScreen(
                         Button(onClick = onContinuar, modifier = Modifier.fillMaxWidth()) {
                             Text("Continuar")
                         }
+                        OutlinedButton(
+                            onClick = { onEvent(AuthEvent.CerrarSesion) },
+                            enabled = !state.isLoading,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text("Cerrar sesión")
+                        }
                     }
                 }
             }

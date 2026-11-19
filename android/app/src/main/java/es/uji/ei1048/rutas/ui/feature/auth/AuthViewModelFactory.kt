@@ -2,6 +2,7 @@ package es.uji.ei1048.rutas.ui.feature.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import es.uji.ei1048.rutas.domain.usecase.CerrarSesionUseCase
 import es.uji.ei1048.rutas.domain.usecase.IniciarSesionUseCase
 import es.uji.ei1048.rutas.domain.usecase.RegistrarUseCase
 
@@ -11,6 +12,7 @@ import es.uji.ei1048.rutas.domain.usecase.RegistrarUseCase
 class AuthViewModelFactory(
     private val registrarUseCase: RegistrarUseCase,
     private val iniciarSesionUseCase: IniciarSesionUseCase,
+    private val cerrarSesionUseCase: CerrarSesionUseCase,
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
@@ -19,6 +21,7 @@ class AuthViewModelFactory(
             return AuthViewModel(
                 registrarUseCase = registrarUseCase,
                 iniciarSesionUseCase = iniciarSesionUseCase,
+                cerrarSesionUseCase = cerrarSesionUseCase,
             ) as T
         }
         throw IllegalArgumentException("Clase ViewModel desconocida: ${modelClass.name}")

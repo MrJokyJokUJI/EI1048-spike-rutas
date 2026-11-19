@@ -2,6 +2,7 @@ package es.uji.ei1048.rutas.ui.feature.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import es.uji.ei1048.rutas.domain.usecase.CerrarSesionUseCase
 import es.uji.ei1048.rutas.domain.usecase.IniciarSesionUseCase
 import es.uji.ei1048.rutas.domain.usecase.RegistrarUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +19,7 @@ import kotlinx.coroutines.launch
 class AuthViewModel(
     private val registrarUseCase: RegistrarUseCase,
     private val iniciarSesionUseCase: IniciarSesionUseCase,
+    private val cerrarSesionUseCase: CerrarSesionUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AuthUiState())
@@ -33,6 +35,31 @@ class AuthViewModel(
             is AuthEvent.MensajeExitoDescartado -> _state.update { it.copy(mensajeExito = null) }
             is AuthEvent.Registrar -> registrar()
             is AuthEvent.IniciarSesion -> iniciarSesion()
+            is AuthEvent.CerrarSesion -> cerrarSesion()
+        }
+    }
+
+    private fun cerrarSesion() {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true, error = null) }
+            runCatching { cerrarSesionUseCase() }
+                .onSuccess {
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            sesion = null,
+                            mensajeExito = "Sesión cerrada.",
+                        )
+                    }
+                }
+                .onFailure { fallo ->
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            error = fallo.message ?: "Error desconocido al cerrar sesión.",
+                        )
+                    }
+                }
         }
     }
 
