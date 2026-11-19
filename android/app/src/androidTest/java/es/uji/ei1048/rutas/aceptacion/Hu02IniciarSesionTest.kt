@@ -88,7 +88,7 @@ class Hu02IniciarSesionTest {
     @Test
     fun hu02_e3_usuarioNoRegistrado_rechazaYNoCreaSesion() = runBlocking {
         // GIVEN
-        authRepository.cerrarSesion()
+        assertNull(authRepository.sesionActual())
 
         // WHEN
         try {
